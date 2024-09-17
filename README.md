@@ -6,5 +6,5 @@ PoC for k8s
 ### List
 
 - AmazonEKS
+- kind
 - minikube
-
