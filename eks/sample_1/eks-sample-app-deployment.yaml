@@ -24,19 +24,25 @@ spec:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-            - matchExpressions:
-              - key: kubernetes.io/arch
-                operator: In
-                values:
-                - amd64
-                - arm64
+              - matchExpressions:
+                  - key: kubernetes.io/arch
+                    operator: In
+                    values:
+                      - amd64
+                      - arm64
       containers:
-      - name: nginx
-        image: public.ecr.aws/nginx/nginx:1.23
-        ports:
-        - name: http
-          containerPort: 80
-        imagePullPolicy: IfNotPresent
+        - name: nginx
+          image: public.ecr.aws/nginx/nginx:1.23
+          resources:
+            requests:
+              memory: "64Mi"
+              cpu: "250m"
+            limits:
+              memory: "128Mi"
+              cpu: "500m"
+          ports:
+            - name: http
+              containerPort: 80
+          imagePullPolicy: IfNotPresent
       nodeSelector:
         kubernetes.io/os: linux
-
