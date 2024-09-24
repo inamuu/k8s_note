@@ -43,3 +43,8 @@ data "aws_iam_policy_document" "aws_loadbalancer_controller_assume_policy" {
     }
   }
 }
+
+resource "aws_iam_policy" "alb_ingress_controller" {
+  name   = "${local.cluster_name}-aws-loadbalancer-controller"
+  policy = file("${path.module}/files/alb-ingress-iam-policy.json")
+}
