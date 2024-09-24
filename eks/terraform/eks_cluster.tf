@@ -11,6 +11,7 @@ resource "aws_eks_cluster" "cluster" {
       var.subnet_ids["private-1a"],
       var.subnet_ids["private-1c"],
     ]
+    public_access_cidrs = var.public_access_cidrs
     # cluster_security_group_id は自分で設定することができない(自動生成される)
     # https://qiita.com/neruneruo/items/f043370ceca855547bdf
   }

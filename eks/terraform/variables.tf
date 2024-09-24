@@ -5,3 +5,8 @@ variable "subnet_ids" {
 variable "vpc_id" {
   type = string
 }
+
+variable "public_access_cidrs" {
+  type    = list(string)
+  default = [""]
+}
