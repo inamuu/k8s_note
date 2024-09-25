@@ -10,3 +10,8 @@ variable "public_access_cidrs" {
   type    = list(string)
   default = [""]
 }
+
+variable "region" {
+  type    = string
+  default = "ap-northeast-1"
+}
