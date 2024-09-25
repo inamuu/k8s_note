@@ -48,3 +48,46 @@ resource "aws_iam_policy" "alb_ingress_controller" {
   name   = "${local.cluster_name}-aws-loadbalancer-controller"
   policy = file("${path.module}/files/alb-ingress-iam-policy.json")
 }
+
+# Helm(AWS Load Balancer Controller)
+# 参考ページ: https://qiita.com/neruneruo/items/f043370ceca855547bdf#helm%E3%81%A7aws-load-balancer-controller%E3%82%92%E8%B5%B7%E5%8B%95%E3%81%99%E3%82%8B
+# Helmで直接実行: https://docs.aws.amazon.com/ja_jp/eks/latest/userguide/lbc-helm.html
+resource "helm_release" "aws_load_balancer_controller" {
+  depends_on = [kubernetes_service_account.awsloadbalancercontroller]
+
+  name       = "aws-load-balancer-controller"
+  repository = "https://aws.github.io/eks-charts"
+  chart      = "aws-load-balancer-controller"
+  namespace  = "kube-system"
+
+  wait_for_jobs = true
+
+  set {
+    name  = "clusterName" // EKSのクラスタ名
+    value = aws_eks_cluster.cluster.name
+  }
+  set {
+    name  = "region" // EKSクラスタを起動しているリージョン
+    value = var.region
+  }
+  set {
+    name  = "vpcId" // EKSクラスタを起動しているVPCのVPC-ID
+    value = var.vpc_id
+  }
+  set {
+    name  = "serviceAccount.create" // ServiceAccountを自動で作成するか
+    value = false
+  }
+  set {
+    name  = "serviceAccount.name" // 前節で作成したServiceAccountと合わせる
+    value = "aws-load-balancer-controller"
+  }
+  set {
+    name  = "ingressClassParams.create" // IngressClassを自動で作るか
+    value = false
+  }
+  set {
+    name  = "createIngressClassResource" // IngressClassを自動で作るか
+    value = false
+  }
+}
