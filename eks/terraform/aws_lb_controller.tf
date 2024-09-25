@@ -49,6 +49,11 @@ resource "aws_iam_policy" "alb_ingress_controller" {
   policy = file("${path.module}/files/alb-ingress-iam-policy.json")
 }
 
+resource "aws_iam_role_policy_attachment" "aws_loadbalancer_controller" {
+  policy_arn = aws_iam_policy.alb_ingress_controller.arn
+  role       = aws_iam_role.aws_loadbalancer_controller.name
+}
+
 # Helm(AWS Load Balancer Controller)
 # 参考ページ: https://qiita.com/neruneruo/items/f043370ceca855547bdf#helm%E3%81%A7aws-load-balancer-controller%E3%82%92%E8%B5%B7%E5%8B%95%E3%81%99%E3%82%8B
 # Helmで直接実行: https://docs.aws.amazon.com/ja_jp/eks/latest/userguide/lbc-helm.html
@@ -84,10 +89,10 @@ resource "helm_release" "aws_load_balancer_controller" {
   }
   set {
     name  = "ingressClassParams.create" // IngressClassを自動で作るか
-    value = false
+    value = true
   }
   set {
     name  = "createIngressClassResource" // IngressClassを自動で作るか
-    value = false
+    value = true
   }
 }
