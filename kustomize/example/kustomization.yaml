@@ -1,0 +1,4 @@
+resources:
+- ./dev
+- ./stg
+namePrefix: cluster-a-
