@@ -43,7 +43,8 @@ module "eks" {
 
   # Cluster access entry
   # To add the current caller identity as an administrator
-  #enable_cluster_creator_admin_permissions = true
+  # NOTE: https://docs.aws.amazon.com/ja_jp/eks/latest/userguide/security_iam_troubleshoot.html#security-iam-troubleshoot-cannot-view-nodes-or-workloads
+  enable_cluster_creator_admin_permissions = true
 
   #access_entries = {
   #  # One access entry with a policy associated
