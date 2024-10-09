@@ -14,3 +14,48 @@ module "karpenter" {
   }
 }
 
+# Karpenter IRSA
+# https://registry.terraform.io/modules/terraform-aws-modules/iam/aws/latest/submodules/iam-role-for-service-accounts-eks
+# https://qiita.com/okubot55/items/15119dac01229a25bd93
+module "karpenter_irsa" {
+  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+
+  role_name                          = "karpenter_controller"
+  attach_karpenter_controller_policy = true
+
+  karpenter_controller_cluster_name       = local.cluster_name
+  karpenter_controller_node_iam_role_arns = [module.eks.eks_managed_node_groups["node01"].iam_role_arn]
+
+  attach_vpc_cni_policy = true
+  vpc_cni_enable_ipv4   = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["default:my-app", "canary:my-app"]
+    }
+  }
+}
+
+resource "kubernetes_namespace" "karpenter" {
+  metadata {
+    name = "karpenter"
+  }
+}
+
+resource "kubernetes_service_account" "karpenter" {
+  metadata {
+    name      = "karpenter"
+    namespace = "karpenter"
+
+    annotations = {
+      "eks.amazonaws.com/role-arn" = module.karpenter_irsa.iam_role_arn
+    }
+  }
+}
+
+resource "aws_iam_instance_profile" "karpenter" {
+  name = "${local.cluster_name}-KarpenterNodeInstanceProfile"
+  role = module.eks.eks_managed_node_groups["node01"].iam_role_name
+}
+
