@@ -1,7 +1,7 @@
 apiVersion: karpenter.sh/v1alpha5
 kind: Provisioner
 metadata:
-  name: test-karpenter
+  name: karpenter
 spec:
   ttlSecondsUntilExpired: 900
   ttlSecondsAfterEmpty: 30
@@ -24,10 +24,35 @@ spec:
       memory: 1000Gi
   provider:
     tags:
-      karpenter.sh/discovery: test-karpentertest
+      karpenter.sh/discovery: karpenter
     subnetSelector:
-      karpenter.sh/discovery: test-karpenter
+      karpenter.sh/discovery: karpenter
     securityGroupSelector:
-      karpenter.sh/discovery: test-karpenter
-    instanceProfile: KarpenterNodeInstanceProfile-test-karpenter
+      karpenter.sh/discovery: karpenter
+    instanceProfile: KarpenterNodeInstanceProfile-karpenter
+---
+apiVersion: karpenter.k8s.aws/v1beta1
+kind: EC2NodeClass
+metadata:
+  name: default
+spec:
+  # Required, resolves a default ami and userdata
+  amiFamily: AL2023
 
+  # Required, discovers subnets to attach to instances
+  # Each term in the array of subnetSelectorTerms is ORed together
+  # Within a single term, all conditions are ANDed
+  subnetSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "karpernter"
+
+  # Required, discovers security groups to attach to instances
+  # Each term in the array of securityGroupSelectorTerms is ORed together
+  # Within a single term, all conditions are ANDed
+  securityGroupSelectorTerms:
+    - tags:
+        karpenter.sh/discovery: "${CLUSTER_NAME}"
+
+  # Optional, IAM instance profile to use for the node identity.
+  # Must specify one of "role" or "instanceProfile" for Karpenter to launch nodes
+  instanceProfile: "KarpenterNodeInstanceProfile-${CLUSTER_NAME}"
