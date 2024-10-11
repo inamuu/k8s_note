@@ -7,7 +7,7 @@ metadata:
   labels:
     app: eks-sample-linux-app
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: eks-sample-linux-app
