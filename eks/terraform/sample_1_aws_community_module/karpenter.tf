@@ -49,7 +49,10 @@ resource "kubernetes_service_account" "karpenter" {
     namespace = "karpenter"
 
     annotations = {
-      "eks.amazonaws.com/role-arn" = module.karpenter_irsa.iam_role_arn
+      "eks.amazonaws.com/role-arn"     = module.karpenter_irsa.iam_role_arn
+      "meta.helm.sh/release-name"      = "karpenter"
+      "meta.helm.sh/release-namespace" = "karpenter"
+      "app.kubernetes.io/managed-by"   = "Helm"
     }
   }
 }
