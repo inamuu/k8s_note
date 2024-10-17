@@ -23,6 +23,12 @@ module "karpenter_irsa" {
   role_name                          = "karpenter_controller"
   attach_karpenter_controller_policy = true
 
+  # SQS でエラーになるので
+  # https://github.com/aws/karpenter-provider-aws/issues/3185
+  role_policy_arns = {
+    policy = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
+  }
+
   karpenter_controller_cluster_name       = local.cluster_name
   karpenter_controller_node_iam_role_arns = [module.eks.eks_managed_node_groups["node01"].iam_role_arn]
 
