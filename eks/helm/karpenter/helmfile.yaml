@@ -1,0 +1,12 @@
+repositories:
+  - name: karpenter
+    url: public.ecr.aws/karpenter
+    oci: true
+
+releases:
+  - name: karpenter
+    namespace: kube-system
+    chart: karpenter/karpenter
+    version: 1.0.6
+    values:
+      - ./values.yaml
