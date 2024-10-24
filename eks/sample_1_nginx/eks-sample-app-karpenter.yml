@@ -1,58 +1,49 @@
-apiVersion: karpenter.sh/v1alpha5
-kind: Provisioner
+apiVersion: karpenter.sh/v1
+kind: NodePool
 metadata:
-  name: karpenter
+  name: default
 spec:
-  ttlSecondsUntilExpired: 900
-  ttlSecondsAfterEmpty: 30
-  requirements:
-    - key: node.kubernetes.io/instance-type
-      operator: In
-      values: ["t4g.medium"]
-    - key: "topology.kubernetes.io/zone"
-      operator: In
-      values: ["ap-northeast-1a", "ap-northeast-1c"]
-    - key: "kubernetes.io/arch"
-      operator: In
-      values: ["amd64"]
-    - key: karpenter.sh/capacity-type
-      operator: In
-      values: ["on-demand"]
+  template:
+    spec:
+      requirements:
+        - key: kubernetes.io/arch
+          operator: In
+          values: ["amd64"]
+        - key: kubernetes.io/os
+          operator: In
+          values: ["linux"]
+        - key: karpenter.sh/capacity-type
+          operator: In
+          values: ["on-demand"]
+        - key: karpenter.k8s.aws/instance-category
+          operator: In
+          values: ["c", "m", "r"]
+        - key: karpenter.k8s.aws/instance-generation
+          operator: Gt
+          values: ["2"]
+      nodeClassRef:
+        group: karpenter.k8s.aws
+        kind: EC2NodeClass
+        name: default
+      expireAfter: 720h # 30 * 24h = 720h
   limits:
-    resources:
-      cpu: "1000"
-      memory: 1000Gi
-  provider:
-    tags:
-      karpenter.sh/discovery: karpenter
-    subnetSelector:
-      karpenter.sh/discovery: karpenter
-    securityGroupSelector:
-      karpenter.sh/discovery: karpenter
-    instanceProfile: KarpenterNodeInstanceProfile-karpenter
+    cpu: 1000
+  disruption:
+    consolidationPolicy: WhenEmptyOrUnderutilized
+    consolidateAfter: 1m
 ---
-apiVersion: karpenter.k8s.aws/v1beta1
+apiVersion: karpenter.k8s.aws/v1
 kind: EC2NodeClass
 metadata:
   name: default
 spec:
-  # Required, resolves a default ami and userdata
-  amiFamily: AL2023
-
-  # Required, discovers subnets to attach to instances
-  # Each term in the array of subnetSelectorTerms is ORed together
-  # Within a single term, all conditions are ANDed
+  amiFamily: AL2023 # Amazon Linux 2
+  role: "KarpenterNode"
   subnetSelectorTerms:
     - tags:
-        karpenter.sh/discovery: "karpernter"
-
-  # Required, discovers security groups to attach to instances
-  # Each term in the array of securityGroupSelectorTerms is ORed together
-  # Within a single term, all conditions are ANDed
+        karpenter.sh/discovery: "karpenter"
   securityGroupSelectorTerms:
     - tags:
-        karpenter.sh/discovery: "${CLUSTER_NAME}"
-
-  # Optional, IAM instance profile to use for the node identity.
-  # Must specify one of "role" or "instanceProfile" for Karpenter to launch nodes
-  instanceProfile: "KarpenterNodeInstanceProfile-${CLUSTER_NAME}"
+        karpenter.sh/discovery: "karpenter"
+  amiSelectorTerms:
+    - id: "ami-09006835f19e96fcb"
