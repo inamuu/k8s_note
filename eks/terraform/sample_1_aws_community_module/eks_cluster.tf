@@ -65,7 +65,8 @@ module "eks" {
   #}
 
   tags = {
-    Environment = "dev"
-    Terraform   = "true"
+    Environment                                 = "dev"
+    Terraform                                   = "true"
+    "kubernetes.io/cluster/dev-dev-eks-1b03569" = "owned"
   }
 }
