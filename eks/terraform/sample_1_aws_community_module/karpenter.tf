@@ -88,3 +88,13 @@ resource "kubernetes_service_account" "karpenter" {
 #  name = "${local.cluster_name}-KarpenterNodeInstanceProfile"
 #  role = module.eks.eks_managed_node_groups["node01"].iam_role_name
 #}
+
+resource "aws_security_group" "karpenter_node" {
+  name        = "karpernter-node"
+  description = "karpernter node security group"
+  vpc_id      = var.vpc_id
+
+  tags = {
+    "karpenter.sh/discovery" = "karpenter"
+  }
+}
