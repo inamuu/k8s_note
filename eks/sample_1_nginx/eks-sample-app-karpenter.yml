@@ -17,10 +17,13 @@ spec:
           values: ["on-demand"]
         - key: karpenter.k8s.aws/instance-category
           operator: In
-          values: ["c", "m", "r"]
+          values: ["t"]
         - key: karpenter.k8s.aws/instance-generation
           operator: Gt
           values: ["2"]
+        - key: "karpenter.k8s.aws/instance-cpu"
+          operator: In
+          values: ["1", "2"]
       nodeClassRef:
         group: karpenter.k8s.aws
         kind: EC2NodeClass
@@ -46,4 +49,6 @@ spec:
     - tags:
         karpenter.sh/discovery: "karpenter"
   amiSelectorTerms:
-    - id: "ami-09006835f19e96fcb"
+    - id: "ami-0b7b1ff91a2a1e299" # aws ssm get-parameter --name /aws/service/eks/optimized-ami/1.31/amazon-linux-2023/x86_64/standard/recommended/image_id --region ap-northeast-1 --query "Parameter.Value" --output text --no-cli-pager
+  tags:
+    Name: karpenter-node
