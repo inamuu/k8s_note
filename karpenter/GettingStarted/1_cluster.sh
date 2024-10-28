@@ -49,9 +49,9 @@ managedNodeGroups:
 - instanceType: m5.large
   amiFamily: AmazonLinux2
   name: ${CLUSTER_NAME}-ng
-  desiredCapacity: 2
+  desiredCapacity: 1
   minSize: 1
-  maxSize: 10
+  maxSize: 2
 
 addons:
 - name: eks-pod-identity-agent
