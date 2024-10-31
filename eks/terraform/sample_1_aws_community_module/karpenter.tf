@@ -21,6 +21,11 @@ module "karpenter" {
   node_iam_role_name            = "KarpenterNode"
   node_iam_role_use_name_prefix = false
 
+  # Attach additional IAM policies to the Karpenter node IAM role
+  node_iam_role_additional_policies = {
+    AmazonSSMManagedInstanceCore = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
+  }
+
   # Since the node group role will already have an access entry
   create_access_entry = false
   tags = {
@@ -30,41 +35,6 @@ module "karpenter" {
   }
 }
 
-# Karpenter IRSA
-# https://registry.terraform.io/modules/terraform-aws-modules/iam/aws/latest/submodules/iam-role-for-service-accounts-eks
-# https://qiita.com/okubot55/items/15119dac01229a25bd93
-#module "karpenter_irsa" {
-#  source = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
-#
-#  role_name                          = "karpenter-controller"
-#  attach_karpenter_controller_policy = true
-#
-#  # SQS でエラーになるので
-#  # https://github.com/aws/karpenter-provider-aws/issues/3185
-#  role_policy_arns = {
-#    policy = "arn:aws:iam::aws:policy/AmazonSQSFullAccess"
-#  }
-#
-#  karpenter_controller_cluster_name       = local.cluster_name
-#  karpenter_controller_node_iam_role_arns = [module.eks.eks_managed_node_groups["node01"].iam_role_arn]
-#
-#  attach_vpc_cni_policy = true
-#  vpc_cni_enable_ipv4   = true
-#
-#  oidc_providers = {
-#    main = {
-#      provider_arn               = module.eks.oidc_provider_arn
-#      namespace_service_accounts = ["kube-system:karpenter"]
-#    }
-#  }
-#}
-#
-#resource "kubernetes_namespace" "karpenter" {
-#  metadata {
-#    name = "karpenter"
-#  }
-#}
-#
 resource "kubernetes_service_account" "karpenter" {
 
   metadata {
@@ -83,11 +53,6 @@ resource "kubernetes_service_account" "karpenter" {
     }
   }
 }
-#
-#resource "aws_iam_instance_profile" "karpenter" {
-#  name = "${local.cluster_name}-KarpenterNodeInstanceProfile"
-#  role = module.eks.eks_managed_node_groups["node01"].iam_role_name
-#}
 
 resource "aws_security_group" "karpenter_node" {
   name        = "karpernter-node"
