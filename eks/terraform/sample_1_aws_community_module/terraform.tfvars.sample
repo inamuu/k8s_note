@@ -1,0 +1,9 @@
+subnet_ids = {
+  private-1a = "subnet-xxx",
+  private-1c = "subnet-xxx",
+}
+vpc_id = "vpc-xxx"
+
+public_access_cidrs = [
+  "0.0.0.0/0",
+]
