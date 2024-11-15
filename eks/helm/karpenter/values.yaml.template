@@ -1,0 +1,20 @@
+#{{- $clusterName := "dev-dev-eks-1b035697" }}
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: # Role ARN for Karpenter
+
+settings:
+  clusterName: # Cluster Name
+  #clusterName: {{ $clusterName }}
+
+#controller:
+#  resources:
+#    requests:
+#      cpu: 1
+#      memory: 1G
+#    limits:
+#      cpu: 1
+#      memory: 1G
+
+replicas: 1
