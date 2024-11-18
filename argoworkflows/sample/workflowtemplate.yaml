@@ -1,0 +1,21 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: template-01
+  namespace: argo
+spec:
+  serviceAccountName: workflow
+  entrypoint: template-01
+  arguments:
+    parameters:
+      - name: shell
+        value: echo 'hello'
+  templates:
+    - name: template-01
+      inputs:
+        parameters:
+          - name: shell
+      container:
+        image: alpine:latest
+        command: [sh, -c]
+        args: ["{{inputs.parameters.shell}}"]
