@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: argo-cli
+  namespace: argo
+  labels:
+    app: argo-cli
+spec:
+  containers:
+    - name: argo-cli
+      image: argoproj/argoexec:latest # Argo CLIが含まれているイメージを使用
+      command:
+        - /bin/bash
+
