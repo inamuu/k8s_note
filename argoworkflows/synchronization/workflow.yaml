@@ -1,0 +1,24 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Workflow
+metadata:
+  generateName: synchronization-wf-level-
+spec:
+  entrypoint: hello-world
+  serviceAccountName: workflows-executor
+  synchronization:
+    semaphores: # v3.6 and after
+      - configMapKeyRef:
+          name: my-config
+          #key: workflow
+          key: template
+    # semaphore: # deprecated: v3.5 and before
+    #   configMapKeyRef:
+    #     name: my-config
+    #     key: workflow
+  templates:
+    - name: hello-world
+      container:
+        image: busybox
+        command: [sleep]
+        args: ["20"]
+
