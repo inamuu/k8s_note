@@ -1,0 +1,22 @@
+apiVersion: argoproj.io/v1alpha1
+kind: CronWorkflow
+metadata:
+  generateName: sample-
+spec:
+  schedule: "* * * * *"
+  timezone: "Asia/Tokyo"
+  # 複数のワークフローが同時にスケジュールされた場合の処理​​を決定するポリシー
+  concurrencyPolicy: "Forbid"
+  # 本来の実行時刻を過ぎても実行したい場合のオプション
+  startingDeadlineSeconds: 0
+  # 成功したワークフローの数。この設定だと4回以上成功すると古いworkflowの結果から削除されていく
+  successfulJobsHistoryLimit: 3
+  # 失敗したワークフローの数。この設定だと2回以上失敗すると古いworkflowの結果から削除されていく
+  failedJobsHistoryLimit: 1
+  workflowSpec:
+    arguments:
+      parameters:
+        - name: shell
+          value: date && sleep 90 && date
+    workflowTemplateRef:
+      name: synchronization-sample

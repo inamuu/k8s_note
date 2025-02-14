@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: WorkflowTemplate
+metadata:
+  name: synchronization-sample
+spec:
+  serviceAccountName: workflows-executor
+  entrypoint: synchronization-sample
+  arguments:
+    parameters:
+      - name: shell
+        value: echo 'hello'
+  templates:
+    - name: synchronization-sample
+      inputs:
+        parameters:
+          - name: shell
+      container:
+        image: alpine:latest
+        command: [sh, -c]
+        args: ["{{inputs.parameters.shell}}"]
